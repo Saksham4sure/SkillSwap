@@ -8,9 +8,11 @@ import {
     ChevronsUpDown,
     Sparkle,
     UserRound,
-    ArrowLeftRight
+    ArrowLeftRight,
+    LogOut,
+    LogIn
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { useEffect } from "react";
 
@@ -22,11 +24,20 @@ const NAV_ITEMS = [
     { id: "profile", label: "Profile", link: "profile", icon: UserRound },
 ];
 
-export default function Navbar({ user }) {
+export default function Navbar({ user, setUser }) {
     const [activeId, setActiveId] = useState("dashboard");
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
-
+    const handleLogout = async () => {
+        try {
+            await api.post("/auth/logout");
+            setUser(null);
+            navigate("/login");
+        } catch (err) {
+            console.log("Logout failed", err);
+        }
+    };
 
     const handleSelect = (id) => {
         setActiveId(id);
@@ -114,25 +125,46 @@ export default function Navbar({ user }) {
                 </nav>
 
                 {/* User profile footer */}
-                    <div className="border-t border-gray-100 px-4 py-4">
-                        {!user ?
-                            <Link to="/login" className='mt-3 flex items-center justify-center bg-gradient-to-br from-[#B3FE3A] to-[#051937] text-white rounded-xl px-4 py-2'>Log in</Link>
-                            : <Link to="/profile" className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-gray-50 cursor-pointer">
-                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#B3FE3A] to-[#051937] text-sm font-semibold text-white">
-                                    {user.name[0]}
+                <div className="border-t border-gray-100 px-4 py-4">
+                    {!user ?
+                        <Link to="/login" className="flex items-center justify-center ">
+                            <div
+                                className="flex cursor-pointer items-center justify-center gap-3 py-2 text-sm bg-zinc-900 text-white hover:bg-black w-full rounded-3xl"
+                            >
+                                <p className="text-lg">Login</p>
+                                <div className="p-2 rounded-full bg-white">
+                                    <LogIn className="w-4 h-4 text-black " />
+                                </div>
+                            </div>
+                        </Link>
+                        :
+                        <Link to="/profile" className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-gray-50 cursor-pointer">
+                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#B3FE3A] to-[#051937] text-sm font-semibold text-white">
+                                {user.name[0]}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                                <span className="block truncate text-sm font-medium text-gray-900">
+                                    {user.name}
                                 </span>
-                                <span className="min-w-0 flex-1">
-                                    <span className="block truncate text-sm font-medium text-gray-900">
-                                        {user.name}
-                                    </span>
-                                    <span className="block truncate text-xs text-gray-400">
-                                        {user.email}
-                                    </span>
+                                <span className="block truncate text-xs text-gray-400">
+                                    {user.email}
                                 </span>
-                                <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
-                            </Link>}
+                            </span>
+                            <ChevronsUpDown className="h-4 w-4 shrink-0 text-gray-400" />
+                        </Link>}
+                </div>
+                {user && <div className="flex items-center justify-center pb-4 px-4">
+                    <div
+                        onClick={handleLogout}
+                        className="flex cursor-pointer items-center justify-center gap-3 py-2 text-sm bg-zinc-900 text-white hover:bg-black w-full rounded-3xl"
+                    >
+                        <p className="text-lg">Logout</p>
+                        <div className="p-2 rounded-full bg-white">
+                            <LogOut className="w-4 h-4 text-black " />
+                        </div>
                     </div>
-                
+                </div>}
+
             </aside>
         </div>
     );

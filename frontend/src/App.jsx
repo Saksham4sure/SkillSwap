@@ -8,30 +8,34 @@ import { useEffect, useState } from 'react';
 import api from './services/api';
 import Discover from './pages/Discover';
 import Requests from './pages/Requests';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const [user, setUser] = useState(null);
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const response = await api.get("/profile");
-            setUser(response.data.user);
-        };
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await api.get("/profile");
+        setUser(response.data.user);
+      } catch (error) {
+        setUser(null);
+      }
+    };
 
-        fetchProfile();
-
-    }, []);
+    fetchProfile();
+  }, []);
 
   return (
     <BrowserRouter>
-      <Navbar user={user} />
+      <Navbar user={user} setUser={setUser} />
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Register />} />
-        <Route path='/discover' element={<Discover />} />
-        <Route path='/requests' element={<Requests />} />
-        <Route path='/profile' element={<Profile user={user} />} />
+        <Route path='/discover' element={<ProtectedRoute><Discover /></ProtectedRoute>} />
+        <Route path='/requests' element={<ProtectedRoute><Requests /></ProtectedRoute>} />
+        <Route path='/profile' element={<ProtectedRoute><Profile user={user} /></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   )

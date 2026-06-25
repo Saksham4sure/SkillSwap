@@ -51,9 +51,13 @@ const login = async (req, res) => {
     return res.status(201).json({ user: user.rows[0] });
 };
 
+const authCheck = async (req, res) => {
+    return res.status(200).json({ authenticated: true, user: req.user });
+};
+
 const logout = (req, res) => {
     res.clearCookie('token');
     return res.status(200).json({ message: "Logged out successfully." });
 };
 
-module.exports = { registerUser, login, logout };
+module.exports = { registerUser, login, logout, authCheck };

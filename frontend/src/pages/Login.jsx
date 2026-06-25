@@ -28,8 +28,8 @@ const Login = () => {
         try {
             const response = await api.post("/auth/login", formData);
             console.log(response.data);
-            navigate("/");
-
+            navigate("/profile");
+            window.location.reload();
         } catch (err) {
             if (err.response) {
                 console.log(err.response.data.message);
